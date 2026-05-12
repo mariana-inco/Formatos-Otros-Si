@@ -8,31 +8,33 @@
 import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { schemaOtrosi, DatosOtrosi } from '../schemas/otrosi.schema';
-import { CamposComunes } from '../components/CamposComunes';
-import { CamposDinamicos } from '../components/CamposDinamicos';
-import { AccionesFormulario } from '../components/FormActions';
-import { generarPDFOtrosi } from '../utils/generatePdf';
-import { guardar, obtenerPorId } from '../utils/almacenamiento';
-import { TipoOtrosi } from '../types/otrosi.types';
+import { schemaOtrosi, DatosOtrosi } from './schemas/otrosi.schema';
+import { CamposComunes } from './components/CamposComunes';
+import { CamposDinamicos } from './components/CamposDinamicos';
+import { AccionesFormulario } from './components/FormActions';
+import { generarPDFOtrosi } from './utils/generatePdf';
+import { guardar } from './utils/almacenamiento';
+import { TipoOtrosi } from './types/otrosi.types';
 
 export default function PaginaOtrosi() {
-  const [tipoOtrosi, setTipoOtrosi] = useState<TipoOtrosi | ''>('');
+  const [tipoOtrosi, setTipoOtrosi] = useState<TipoOtrosi>('cambio_cargo');
   const [cargandoPDF, setCargandoPDF] = useState(false);
   const [idGuardado, setIdGuardado] = useState<string | null>(null);
   const [mostrarMensajeExito, setMostrarMensajeExito] = useState(false);
 
   const form = useForm<DatosOtrosi>({
     resolver: zodResolver(schemaOtrosi),
-    mode: 'onChange',
+    mode: 'onBlur',
     defaultValues: {
-      tipoOtrosi: '',
+      tipoOtrosi: 'cambio_cargo' as any,
       numeroDocumento: '',
       tipoDocumento: 'cedula',
       nombreEmpleado: '',
       lugarFirma: 'Mosquera',
-      fechaFirma: new Date().toISOString().split('T')[0]
-    }
+      fechaFirma: new Date().toISOString().split('T')[0],
+      cargoNuevo: '',
+      fechaInicioCargo: ''
+    } as any
   });
 
   const { watch, reset, handleSubmit, formState: { errors } } = form;
@@ -92,13 +94,13 @@ export default function PaginaOtrosi() {
   const handleLimpiar = () => {
     if (confirm('¿Está seguro de que desea limpiar el formulario?')) {
       reset();
-      setTipoOtrosi('');
+      setTipoOtrosi('cambio_cargo');
       setIdGuardado(null);
     }
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Encabezado */}
         <div className="mb-8">
@@ -139,7 +141,7 @@ export default function PaginaOtrosi() {
             {tipoOtrosi && <CamposDinamicos tipoOtrosi={tipoOtrosi} />}
 
             {/* Resumen visual */}
-            {tipoOtrosi && tipoOtrosi !== 'termino_indefinido' && (
+            {tipoOtrosi !== 'termino_indefinido' && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
                   <span className="font-semibold">Recuerda:</span> Completa todos los campos marcados con
