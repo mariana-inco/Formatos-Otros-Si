@@ -175,7 +175,7 @@ En `utils/generatePdf.ts`, modificar:
 |------|-------------------|--------|
 | Cambio de Cargo | cargo_nuevo, fecha_inicio_cargo | ✅ |
 | Cambio de Cargo y/o Salario | cargo_nuevo, fecha_inicio_cargo, nuevo_salario | ✅ |
-| Prórroga | numero_prorroga, fecha_terminacion_actual, fecha_terminacion_nueva | ✅ |
+| Prórroga | fecha de constancia convertida a texto de firma | ✅ |
 | Cambio de Obra | obra_anterior, obra_nueva, porcentaje_avance | ✅ |
 | Ampliación de Porcentaje | codigo_obra, nombre_obra, porcentajes | ✅ |
 | Cambio a Término Indefinido | (ninguno) | ✅ |

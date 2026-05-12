@@ -1,13 +1,5 @@
-/**
- * Esquemas de validación con Zod
- * Define las reglas de validación para todos los tipos de otrosí
- */
-
 import { z } from 'zod';
 
-/**
- * Esquema para campos comunes en todos los otrosí
- */
 const schemaCamposComunes = z.object({
   tipoOtrosi: z.enum([
     'cambio_cargo',
@@ -37,28 +29,22 @@ const schemaCamposComunes = z.object({
     .refine((date) => !isNaN(Date.parse(date)), 'La fecha debe ser válida')
 });
 
-/**
- * Schema para Cambio de Cargo
- */
 export const schemaCambioCargo = schemaCamposComunes.extend({
   cargoNuevo: z
     .string()
     .min(3, 'El cargo debe tener al menos 3 caracteres')
     .max(100, 'El cargo no puede exceder 100 caracteres'),
-  fechaInicioCargo: z
+  constanciaFirma: z
     .string()
     .refine((date) => !isNaN(Date.parse(date)), 'La fecha debe ser válida')
 });
 
-/**
- * Schema para Cambio de Cargo y/o Salario
- */
 export const schemaCambioCargoSalario = schemaCamposComunes.extend({
   cargoNuevo: z
     .string()
     .min(3, 'El cargo debe tener al menos 3 caracteres')
     .max(100, 'El cargo no puede exceder 100 caracteres'),
-  fechaInicioCargo: z
+  constanciaFirma: z
     .string()
     .refine((date) => !isNaN(Date.parse(date)), 'La fecha debe ser válida'),
   nuevoSalario: z
@@ -67,35 +53,12 @@ export const schemaCambioCargoSalario = schemaCamposComunes.extend({
     .refine((valor) => valor >= 0, 'El salario no puede ser negativo')
 });
 
-/**
- * Schema para Prórroga de Contrato
- */
 export const schemaProrroga = schemaCamposComunes.extend({
-  numeroProrroga: z
-    .number()
-    .int('El número de prórroga debe ser un número entero')
-    .positive('El número de prórroga debe ser positivo'),
-  fechaTerminacionActual: z
+  constanciaFirma: z
     .string()
     .refine((date) => !isNaN(Date.parse(date)), 'La fecha debe ser válida'),
-  fechaTerminacionNueva: z
-    .string()
-    .refine((date) => !isNaN(Date.parse(date)), 'La fecha debe ser válida')
-}).refine(
-  (data) => {
-    const actual = new Date(data.fechaTerminacionActual);
-    const nueva = new Date(data.fechaTerminacionNueva);
-    return nueva > actual;
-  },
-  {
-    message: 'La fecha de terminación nueva debe ser posterior a la actual',
-    path: ['fechaTerminacionNueva']
-  }
-);
+});
 
-/**
- * Schema para Cambio de Obra
- */
 export const schemaCambioObra = schemaCamposComunes.extend({
   obraAnterior: z
     .string()
@@ -108,12 +71,12 @@ export const schemaCambioObra = schemaCamposComunes.extend({
   porcentajeAvanceNuevaObra: z
     .number()
     .min(0, 'El porcentaje no puede ser menor a 0')
-    .max(100, 'El porcentaje no puede ser mayor a 100')
+    .max(100, 'El porcentaje no puede ser mayor a 100'),
+  constanciaFirma: z
+    .string()
+    .refine((date) => !isNaN(Date.parse(date)), 'La fecha debe ser válida')
 });
 
-/**
- * Schema para Ampliación de Porcentaje
- */
 export const schemaAmpliacionPorcentaje = schemaCamposComunes.extend({
   codigoObra: z
     .string()
@@ -134,7 +97,10 @@ export const schemaAmpliacionPorcentaje = schemaCamposComunes.extend({
   porcentajeNuevo: z
     .number()
     .min(0, 'El porcentaje no puede ser menor a 0')
-    .max(100, 'El porcentaje no puede ser mayor a 100')
+    .max(100, 'El porcentaje no puede ser mayor a 100'),
+  constanciaFirma: z
+    .string()
+    .refine((date) => !isNaN(Date.parse(date)), 'La fecha debe ser válida')
 }).refine(
   (data) => {
     const suma = data.porcentajeAnterior + data.porcentajeProrroga;
@@ -146,14 +112,23 @@ export const schemaAmpliacionPorcentaje = schemaCamposComunes.extend({
   }
 );
 
-/**
- * Schema para Cambio a Término Indefinido
- */
-export const schemaTerminoIndefinido = schemaCamposComunes;
+export const schemaTerminoIndefinido = schemaCamposComunes.extend({
+  numeroProrroga: z
+    .string()
+    .min(3, 'El número de prórroga debe tener al menos 3 caracteres')
+    .max(80, 'El número de prórroga no puede exceder 80 caracteres'),
+  descripcionFinProrroga: z
+    .string()
+    .min(3, 'La descripción debe tener al menos 3 caracteres')
+    .max(200, 'La descripción no puede exceder 200 caracteres'),
+  fechaTerminacionProrroga: z
+    .string()
+    .refine((date) => !isNaN(Date.parse(date)), 'La fecha debe ser válida'),
+  constanciaFirma: z
+    .string()
+    .refine((date) => !isNaN(Date.parse(date)), 'La fecha debe ser válida')
+});
 
-/**
- * Schema dinámico que valida según el tipo de otrosí
- */
 export const schemaOtrosi = z.discriminatedUnion('tipoOtrosi', [
   schemaCambioCargo.extend({ tipoOtrosi: z.literal('cambio_cargo') }),
   schemaCambioCargoSalario.extend({ tipoOtrosi: z.literal('cambio_cargo_salario') }),

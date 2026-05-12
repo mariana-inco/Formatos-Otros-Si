@@ -1,8 +1,3 @@
-/**
- * Tipos principales para el módulo de Otrosí
- * Define la estructura de datos para todos los tipos de otrosí del contrato
- */
-
 export type TipoOtrosi =
   | 'cambio_cargo'
   | 'cambio_cargo_salario'
@@ -13,10 +8,6 @@ export type TipoOtrosi =
 
 export type TipoDocumento = 'cedula' | 'pasaporte' | 'cedula_extranjeria';
 
-/**
- * Interfaz base para todos los otrosí
- * Contiene los campos comunes obligatorios
- */
 export interface CamposComunes {
   tipoOtrosi: TipoOtrosi;
   numeroDocumento: string;
@@ -26,30 +17,26 @@ export interface CamposComunes {
   fechaFirma: string;
 }
 
-/**
- * Campos específicos para cada tipo de otrosí
- */
 export interface CamposCambioCargo {
   cargoNuevo: string;
-  fechaInicioCargo: string;
+  constanciaFirma: string;
 }
 
 export interface CamposCambioCargoSalario {
   cargoNuevo: string;
-  fechaInicioCargo: string;
+  constanciaFirma: string;
   nuevoSalario: number;
 }
 
 export interface CamposProrroga {
-  numeroProrroga: number;
-  fechaTerminacionActual: string;
-  fechaTerminacionNueva: string;
+  constanciaFirma: string;
 }
 
 export interface CamposCambioObra {
   obraAnterior: string;
   obraNueva: string;
   porcentajeAvanceNuevaObra: number;
+  constanciaFirma: string;
 }
 
 export interface CamposAmpliacionPorcentaje {
@@ -58,22 +45,24 @@ export interface CamposAmpliacionPorcentaje {
   porcentajeAnterior: number;
   porcentajeProrroga: number;
   porcentajeNuevo: number;
+  constanciaFirma: string;
 }
 
-/**
- * Tipo unión de todos los formatos de otrosí
- */
+export interface CamposTerminoFijoInferior {
+  numeroProrroga: string;
+  descripcionFinProrroga: string;
+  fechaTerminacionProrroga: string;
+  constanciaFirma: string;
+}
+
 export type DatosOtrosi =
   | (CamposComunes & CamposCambioCargo)
   | (CamposComunes & CamposCambioCargoSalario)
   | (CamposComunes & CamposProrroga)
   | (CamposComunes & CamposCambioObra)
   | (CamposComunes & CamposAmpliacionPorcentaje)
-  | CamposComunes;
+  | (CamposComunes & CamposTerminoFijoInferior);
 
-/**
- * Estructura para almacenamiento persistente
- */
 export interface OtrosiAlmacenado {
   id: string;
   datos: DatosOtrosi;
@@ -82,11 +71,6 @@ export interface OtrosiAlmacenado {
   estado: 'borrador' | 'completado' | 'firmado';
 }
 
-export type OtrrosiAlmacenado = OtrosiAlmacenado;
-
-/**
- * Configuración de labels y placeholders para campos
- */
 export interface ConfiguracionCampo {
   label: string;
   placeholder?: string;
@@ -99,8 +83,4 @@ export interface ConfiguracionCampo {
     patron?: RegExp;
     mensaje?: string;
   };
-}
-
-export interface LabelsPorTipo {
-  [key: string]: ConfiguracionCampo;
 }

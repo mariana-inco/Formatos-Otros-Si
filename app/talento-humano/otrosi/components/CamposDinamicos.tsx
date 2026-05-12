@@ -1,10 +1,5 @@
 'use client';
 
-/**
- * Componente para mostrar campos dinámicos según el tipo de otrosí
- * Se renderiza diferente según qué tipo se selecciona
- */
-
 import { Controller, useFormContext } from 'react-hook-form';
 import type { FieldPath } from 'react-hook-form';
 import { TipoOtrosi } from '../types/otrosi.types';
@@ -18,27 +13,28 @@ interface PropsDynamicFields {
 export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
   const { control } = useFormContext<DatosOtrosi>();
 
-  // Si no hay tipo seleccionado o es término indefinido (sin campos adicionales)
-  if (!tipoOtrosi || tipoOtrosi === 'termino_indefinido') {
+  if (!tipoOtrosi) {
     return null;
   }
 
-  // Obtener los campos requeridos para este tipo
   const camposRequeridos = camposPorTipo[tipoOtrosi as TipoOtrosi] || [];
 
   return (
-    <div className="space-y-5 bg-linear-to-br from-green-50 to-emerald-50 p-6 rounded-lg border border-green-100">
-      <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-        <span className="flex w-8 h-8 bg-green-500 text-white rounded-full items-center justify-center text-sm font-bold">
-          2
-        </span>
-        Información Específica
-      </h2>
+    <section className="rounded-2xl border border-slate-200 bg-white p-8">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold uppercase">Información Específica</h2>
+        {tipoOtrosi !== 'prorroga' && (
+          <p className="mt-3 text-lg text-slate-700">
+            Complete los datos asociados al tipo de otrosí seleccionado.
+          </p>
+        )}
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {camposRequeridos.map((nombreCampo) => {
           const config = configuracionCampos[nombreCampo];
           if (!config) return null;
+          const esFechaConstanciaFirma = nombreCampo === 'constanciaFirma';
 
           return (
             <Controller
@@ -46,18 +42,32 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
               name={nombreCampo as FieldPath<DatosOtrosi>}
               control={control}
               render={({ field, fieldState: { error } }) => (
-                <div className={config.tipo === 'texto' && nombreCampo.includes('Obra') ? 'md:col-span-2' : ''}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div
+                  className={
+                    tipoOtrosi === 'ampliacion_porcentaje' ||
+                    tipoOtrosi === 'cambio_obra' ||
+                    tipoOtrosi === 'termino_indefinido' ||
+                    tipoOtrosi === 'cambio_cargo' ||
+                    (config.tipo === 'texto' && nombreCampo.includes('Obra'))
+                      ? 'md:col-span-2'
+                      : ''
+                  }
+                >
+                  <label
+                    className={`mb-3 block text-lg font-semibold ${
+                      nombreCampo === 'constanciaFirma' ? 'italic' : ''
+                    }`}
+                  >
                     {config.label}
                     {config.obligatorio && <span className="text-red-500">*</span>}
                   </label>
 
-                  {config.tipo === 'texto' && (
+                  {config.tipo === 'texto' && !esFechaConstanciaFirma && (
                     <input
                       {...field}
                       type="text"
                       placeholder={config.placeholder}
-                      className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition ${
+                      className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
                         error ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                     />
@@ -72,17 +82,17 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
                       min={config.minimo}
                       max={config.maximo}
                       onChange={(e) => field.onChange(Number(e.target.value))}
-                      className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition ${
+                      className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
                         error ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                     />
                   )}
 
-                  {config.tipo === 'fecha' && (
+                  {(config.tipo === 'fecha' || esFechaConstanciaFirma) && (
                     <input
                       {...field}
                       type="date"
-                      className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition ${
+                      className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
                         error ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                     />
@@ -92,7 +102,6 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
                     <p className="text-red-500 text-xs mt-1">{error.message}</p>
                   )}
 
-                  {/* Ayuda adicional para campos específicos */}
                   {nombreCampo.includes('Porcentaje') && !error && (
                     <p className="text-gray-500 text-xs mt-1">Ingrese un valor entre 0 y 100</p>
                   )}
@@ -107,27 +116,6 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
         })}
       </div>
 
-      {/* Mensaje informativo según el tipo */}
-      <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-gray-700">
-        <p className="font-medium mb-1">💡 Información:</p>
-        <p>{obtenerMensajeInfoTipo(tipoOtrosi as TipoOtrosi)}</p>
-      </div>
-    </div>
+    </section>
   );
-}
-
-/**
- * Retorna un mensaje informativo según el tipo de otrosí
- */
-function obtenerMensajeInfoTipo(tipo: TipoOtrosi): string {
-  const mensajes: Record<TipoOtrosi, string> = {
-    cambio_cargo: 'Complete con el nuevo cargo y su fecha de inicio.',
-    cambio_cargo_salario: 'Indique el nuevo cargo, fecha de inicio y nuevo salario.',
-    prorroga: 'Especifique el número de prórroga y las fechas de terminación.',
-    cambio_obra: 'Indique la obra anterior, nueva obra y su porcentaje de avance.',
-    ampliacion_porcentaje: 'Complete los porcentajes de asignación en las diferentes obras.',
-    termino_indefinido: 'Este otrosí no requiere información adicional.'
-  };
-
-  return mensajes[tipo];
 }

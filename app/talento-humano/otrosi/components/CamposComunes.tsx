@@ -1,21 +1,18 @@
 'use client';
 
-/**
- * Componente para mostrar los campos comunes del otrosí
- * Estos campos se muestran en todos los tipos de otrosí
- */
-
 import { Controller, useFormContext } from 'react-hook-form';
 import { buscarEmpleados, tiposDocumento, type Empleado } from '../data/empleados';
 import { useState } from 'react';
 
-interface PropsCommonFields {
-  onEmpleadoSeleccionado?: (numeroDocumento: string) => void;
-}
-
-export function CamposComunes({ onEmpleadoSeleccionado }: PropsCommonFields) {
+export function CamposComunes() {
   const { control, watch, setValue } = useFormContext();
+  const tipoOtrosi = watch('tipoOtrosi');
   const numeroDocumento = watch('numeroDocumento');
+  const usaEtiquetasTrabajador =
+    tipoOtrosi === 'cambio_cargo' ||
+    tipoOtrosi === 'cambio_obra' ||
+    tipoOtrosi === 'ampliacion_porcentaje' ||
+    tipoOtrosi === 'termino_indefinido';
   const [sugerenciasEmpleados, setSugerenciasEmpleados] = useState<Empleado[]>([]);
   const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
 
@@ -33,71 +30,40 @@ export function CamposComunes({ onEmpleadoSeleccionado }: PropsCommonFields) {
     setValue('numeroDocumento', numeroDoc);
     setValue('nombreEmpleado', nombre);
     setMostrarSugerencias(false);
-    onEmpleadoSeleccionado?.(numeroDoc);
   };
 
   return (
-    <div className="space-y-5 bg-linear-to-br from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100">
-      <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-        <span className="flex w-8 h-8 bg-blue-500 text-white rounded-full items-center justify-center text-sm font-bold">
-          1
-        </span>
-        Información General
-      </h2>
-
-      {/* Tipo de Otrosí */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Tipo de Otrosí <span className="text-red-500">*</span>
-        </label>
-        <Controller
-          name="tipoOtrosi"
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <div>
-              <select
-                {...field}
-                className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
-                  error ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
-              >
-                <option value="">-- Seleccione un tipo --</option>
-                <option value="cambio_cargo">Cambio de Cargo</option>
-                <option value="cambio_cargo_salario">Cambio de Cargo y/o Salario</option>
-                <option value="prorroga">Prórroga de Contrato a Término Fijo</option>
-                <option value="cambio_obra">Cambio de Obra</option>
-                <option value="ampliacion_porcentaje">Ampliación de Porcentaje de Obra</option>
-                <option value="termino_indefinido">Cambio a Término Indefinido</option>
-              </select>
-              {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
-            </div>
-          )}
-        />
+    <section className="rounded-2xl border border-slate-200 bg-white p-8">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold uppercase">Información General</h2>
+        <p className="mt-3 text-lg text-slate-700">
+          Registre los datos principales del otrosí.
+        </p>
       </div>
 
-      {/* Tipo de Documento */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="space-y-7">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tipo de Documento <span className="text-red-500">*</span>
+          <label className="mb-3 block text-lg font-semibold">
+            Tipo de Otrosí <span className="text-red-500">*</span>
           </label>
           <Controller
-            name="tipoDocumento"
+            name="tipoOtrosi"
             control={control}
             render={({ field, fieldState: { error } }) => (
               <div>
                 <select
                   {...field}
-                  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+                  className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
                     error ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                 >
-                  <option value="">-- Seleccione --</option>
-                  {tiposDocumento.map((tipo) => (
-                    <option key={tipo.valor} value={tipo.valor}>
-                      {tipo.etiqueta}
-                    </option>
-                  ))}
+                  <option value="">-- Seleccione un tipo --</option>
+                  <option value="cambio_cargo">Cambio de Cargo</option>
+                  <option value="cambio_cargo_salario">Cambio de Cargo y/o Salario</option>
+                  <option value="prorroga">Contrato de trabajo suscrito - Término Indefinido</option>
+                  <option value="cambio_obra">Contrato de trabajo suscrito - Cambio de Obra </option>
+                  <option value="ampliacion_porcentaje">Contrato de trabajo a término de obra o labor determinada - Ampliación de porcentaje de obra</option>
+                  <option value="termino_indefinido">Contrato de trabajo a término fijo inferior a un año suscrito</option>
                 </select>
                 {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
               </div>
@@ -105,10 +71,44 @@ export function CamposComunes({ onEmpleadoSeleccionado }: PropsCommonFields) {
           />
         </div>
 
-        {/* Número de Documento */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Número de Documento <span className="text-red-500">*</span>
+     <div className={tipoOtrosi === 'cambio_cargo' ? '' : 'order-1 md:order-2'}>
+            <label className="mb-3 block text-lg font-semibold">
+              {usaEtiquetasTrabajador
+                ? 'Tipo de documento del trabajador'
+                : 'Tipo de Documento'}{' '}
+              <span className="text-red-500">*</span>
+            </label>
+            <Controller
+              name="tipoDocumento"
+              control={control}
+              render={({ field, fieldState: { error } }) => (
+                <div>
+                  <select
+                    {...field}
+                    className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
+                      error ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    }`}
+                  >
+                    <option value="">-- Seleccione --</option>
+                    {tiposDocumento.map((tipo) => (
+                      <option key={tipo.valor} value={tipo.valor}>
+                        {tipo.etiqueta}
+                      </option>
+                    ))}
+                  </select>
+                  {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
+                </div>
+              )}
+            />
+          </div>
+
+        <div className={tipoOtrosi === 'cambio_cargo' ? 'space-y-7' : 'grid grid-cols-1 gap-6 md:grid-cols-2'}>
+          <div className={tipoOtrosi === 'cambio_cargo' ? '' : 'order-2 md:order-1'}>
+          <label className="mb-3 block text-lg font-semibold">
+            {usaEtiquetasTrabajador
+              ? 'Número de documento del trabajador'
+              : 'Número de Documento'}{' '}
+            <span className="text-red-500">*</span>
           </label>
           <Controller
             name="numeroDocumento"
@@ -124,13 +124,12 @@ export function CamposComunes({ onEmpleadoSeleccionado }: PropsCommonFields) {
                     manejarBusquedaEmpleado(e.target.value);
                   }}
                   onFocus={() => numeroDocumento && setMostrarSugerencias(true)}
-                  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+                  className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
                     error ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                 />
                 {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
 
-                {/* Sugerencias de empleados */}
                 {mostrarSugerencias && sugerenciasEmpleados.length > 0 && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
                     {sugerenciasEmpleados.map((empleado) => (
@@ -150,48 +149,26 @@ export function CamposComunes({ onEmpleadoSeleccionado }: PropsCommonFields) {
             )}
           />
         </div>
-      </div>
 
-      {/* Nombre del Empleado */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Nombre del Empleado <span className="text-red-500">*</span>
-        </label>
-        <Controller
-          name="nombreEmpleado"
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <div>
-              <input
-                {...field}
-                type="text"
-                placeholder="Juan Pérez García"
-                className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
-                  error ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
-              />
-              {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
-            </div>
-          )}
-        />
-      </div>
+     
+        </div>
 
-      {/* Lugar y Fecha de Firma */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Lugar de Firma <span className="text-red-500">*</span>
+          <label className="mb-3 block text-lg font-semibold">
+            {usaEtiquetasTrabajador ? 'Nombre del trabajador' :
+             'Nombre del Empleado'}{' '}
+            <span className="text-red-500">*</span>
           </label>
           <Controller
-            name="lugarFirma"
+            name="nombreEmpleado"
             control={control}
             render={({ field, fieldState: { error } }) => (
               <div>
                 <input
                   {...field}
                   type="text"
-                  placeholder="Mosquera"
-                  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+                  placeholder="Juan Pérez García"
+                  className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
                     error ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                 />
@@ -201,28 +178,9 @@ export function CamposComunes({ onEmpleadoSeleccionado }: PropsCommonFields) {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Fecha de Firma <span className="text-red-500">*</span>
-          </label>
-          <Controller
-            name="fechaFirma"
-            control={control}
-            render={({ field, fieldState: { error } }) => (
-              <div>
-                <input
-                  {...field}
-                  type="date"
-                  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
-                    error ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
-                />
-                {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
-              </div>
-            )}
-          />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         </div>
       </div>
-    </div>
+    </section>
   );
 }
