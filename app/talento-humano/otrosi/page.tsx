@@ -114,10 +114,10 @@ export default function PaginaOtrosi() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 px-6 py-10 text-slate-950">
-      <div className="mx-auto max-w-7xl rounded-lg border border-slate-300 bg-white px-10 py-12">
+    <div className="min-h-screen bg-neutral-50 px-4 py-6 text-slate-950 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+      <div className="mx-auto max-w-7xl rounded-lg border border-slate-300 bg-white px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 lg:px-10 lg:py-12">
         <header className="mb-9 border-b border-slate-200 pb-8">
-          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-lg font-bold tracking-wide">DROMOS</p>
               <p className="mt-3 text-lg text-slate-700">GESTIÓN DE TALENTO HUMANO</p>
@@ -126,7 +126,7 @@ export default function PaginaOtrosi() {
               </h1>
             </div>
 
-            <div className="space-y-4 text-left text-lg text-slate-700 md:text-right">
+            <div className="space-y-4 text-left text-lg text-slate-700 lg:text-right">
               <p>
                 Código: <span className="font-bold text-slate-950">GTH-F003</span>
               </p>

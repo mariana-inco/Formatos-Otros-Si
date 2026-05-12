@@ -38,8 +38,8 @@ export function CamposComunes() {
   };
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-8">
-      <div className="mb-8">
+    <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 md:p-8">
+      <div className="mb-6 sm:mb-8">
         <h2 className="text-2xl font-bold uppercase">Información General</h2>
         <p className="mt-3 text-lg text-slate-700">
           Registre los datos principales del otrosí.
@@ -110,7 +110,7 @@ export function CamposComunes() {
             />
           </div>
 
-        <div className={tipoOtrosi === 'cambio_cargo' ? 'space-y-7' : 'grid grid-cols-1 gap-6 md:grid-cols-2'}>
+        <div className={tipoOtrosi === 'cambio_cargo' ? 'space-y-7' : 'grid grid-cols-1 gap-6 lg:grid-cols-2'}>
           <div className={tipoOtrosi === 'cambio_cargo' ? '' : 'order-2 md:order-1'}>
           <label className="mb-3 block text-lg font-semibold">
             {usaEtiquetasTrabajador

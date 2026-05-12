@@ -21,15 +21,15 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
   const camposRequeridos = camposPorTipo[tipoOtrosi as TipoOtrosi] || [];
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-8">
-      <div className="mb-8">
+    <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 md:p-8">
+      <div className="mb-6 sm:mb-8">
         <h2 className="text-2xl font-bold uppercase">Información Específica</h2>
         <p className="mt-3 text-lg text-slate-700">
           Complete los datos asociados al tipo de otrosí seleccionado.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {camposRequeridos.map((nombreCampo) => {
           const config = configuracionCampos[nombreCampo];
           if (!config) return null;
@@ -48,7 +48,7 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
                     tipoOtrosi === 'termino_indefinido' ||
                     tipoOtrosi === 'cambio_cargo' ||
                     (config.tipo === 'texto' && nombreCampo.includes('Obra'))
-                      ? 'md:col-span-2'
+                      ? 'lg:col-span-2'
                       : ''
                   }
                 >
