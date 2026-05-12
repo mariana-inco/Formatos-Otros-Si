@@ -2,6 +2,7 @@
 
 import { Controller, useFormContext } from 'react-hook-form';
 import { buscarEmpleados, tiposDocumento, type Empleado } from '../data/empleados';
+import { configuracionCampos } from '../config/fieldConfig';
 import { useState } from 'react';
 
 export function CamposComunes() {
@@ -50,6 +51,9 @@ export function CamposComunes() {
           <label className="mb-3 block text-lg font-semibold">
             Tipo de Otrosí <span className="text-red-500">*</span>
           </label>
+          <p className="mb-3 text-sm text-slate-600">
+            Seleccione el tipo de formato que desea diligenciar.
+          </p>
           <Controller
             name="tipoOtrosi"
             control={control}
@@ -185,6 +189,32 @@ export function CamposComunes() {
             )}
           />
         </div>
+
+        {tipoOtrosi === 'prorroga' && (
+          <div>
+            <label className="mb-3 block text-lg font-semibold italic">
+              {configuracionCampos.constanciaFirma.label}
+              <span className="text-red-500">*</span>
+            </label>
+            <Controller
+              name="constanciaFirma"
+              control={control}
+              render={({ field, fieldState: { error } }) => (
+                <div>
+                  <input
+                    {...field}
+                    value={typeof field.value === 'string' ? field.value : ''}
+                    type="date"
+                    className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
+                      error ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    }`}
+                  />
+                  {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
+                </div>
+              )}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         </div>

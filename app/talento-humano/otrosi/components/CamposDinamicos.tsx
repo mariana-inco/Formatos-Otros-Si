@@ -14,7 +14,7 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
   const { control } = useFormContext<DatosOtrosi>();
   const limpiarSoloNumeros = (valor: string) => valor.replace(/\D/g, '');
 
-  if (!tipoOtrosi) {
+  if (!tipoOtrosi || tipoOtrosi === 'prorroga') {
     return null;
   }
 
@@ -24,11 +24,9 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
     <section className="rounded-2xl border border-slate-200 bg-white p-8">
       <div className="mb-8">
         <h2 className="text-2xl font-bold uppercase">Información Específica</h2>
-        {tipoOtrosi !== 'prorroga' && (
-          <p className="mt-3 text-lg text-slate-700">
-            Complete los datos asociados al tipo de otrosí seleccionado.
-          </p>
-        )}
+        <p className="mt-3 text-lg text-slate-700">
+          Complete los datos asociados al tipo de otrosí seleccionado.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
