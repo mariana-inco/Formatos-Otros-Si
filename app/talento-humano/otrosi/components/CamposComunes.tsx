@@ -16,6 +16,10 @@ export function CamposComunes() {
   const [sugerenciasEmpleados, setSugerenciasEmpleados] = useState<Empleado[]>([]);
   const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
 
+  const limpiarSoloNumeros = (valor: string) => valor.replace(/\D/g, '');
+  const limpiarSoloLetras = (valor: string) =>
+    valor.replace(/[^a-záéíóúñü\s]/gi, '');
+
   const manejarBusquedaEmpleado = (valor: string) => {
     if (valor.length > 2) {
       const resultados = buscarEmpleados(valor);
@@ -118,10 +122,13 @@ export function CamposComunes() {
                 <input
                   {...field}
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="1025630234"
                   onChange={(e) => {
-                    field.onChange(e);
-                    manejarBusquedaEmpleado(e.target.value);
+                    const valorLimpio = limpiarSoloNumeros(e.target.value);
+                    field.onChange(valorLimpio);
+                    manejarBusquedaEmpleado(valorLimpio);
                   }}
                   onFocus={() => numeroDocumento && setMostrarSugerencias(true)}
                   className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
@@ -168,6 +175,7 @@ export function CamposComunes() {
                   {...field}
                   type="text"
                   placeholder="Juan Pérez García"
+                  onChange={(e) => field.onChange(limpiarSoloLetras(e.target.value))}
                   className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
                     error ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}

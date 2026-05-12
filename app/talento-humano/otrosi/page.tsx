@@ -74,7 +74,7 @@ export default function PaginaOtrosi() {
     }
   });
 
-  const { handleSubmit } = form;
+  const { handleSubmit, reset } = form;
   const tipoOtrosi = useWatch({
     control: form.control,
     name: 'tipoOtrosi',
@@ -92,6 +92,17 @@ export default function PaginaOtrosi() {
       const resultado = guardar(datosParaGuardar, idGuardado || undefined);
       setIdGuardado(resultado.id);
       alert('Formulario enviado. Las respuestas se mostraron en la consola.');
+      reset({
+        tipoOtrosi: 'cambio_cargo',
+        numeroDocumento: '',
+        tipoDocumento: 'cedula',
+        nombreEmpleado: '',
+        lugarFirma: 'Mosquera',
+        fechaFirma: new Date().toISOString().split('T')[0],
+        cargoNuevo: '',
+        constanciaFirma: ''
+      });
+      setIdGuardado(null);
     } catch (error) {
       console.error('Error al guardar:', error);
       alert('Error al guardar el otrosí. Intente nuevamente.');

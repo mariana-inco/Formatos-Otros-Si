@@ -12,6 +12,7 @@ interface PropsDynamicFields {
 
 export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
   const { control } = useFormContext<DatosOtrosi>();
+  const limpiarSoloNumeros = (valor: string) => valor.replace(/\D/g, '');
 
   if (!tipoOtrosi) {
     return null;
@@ -65,6 +66,7 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
                   {config.tipo === 'texto' && !esFechaConstanciaFirma && (
                     <input
                       {...field}
+                      value={typeof field.value === 'string' ? field.value : ''}
                       type="text"
                       placeholder={config.placeholder}
                       className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
@@ -76,12 +78,15 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
                   {config.tipo === 'numero' && (
                     <input
                       {...field}
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       placeholder={config.placeholder}
-                      step={config.paso || 1}
-                      min={config.minimo}
-                      max={config.maximo}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      value={field.value ?? ''}
+                      onChange={(e) => {
+                        const valorLimpio = limpiarSoloNumeros(e.target.value);
+                        field.onChange(valorLimpio === '' ? '' : Number(valorLimpio));
+                      }}
                       className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
                         error ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
@@ -91,6 +96,7 @@ export function CamposDinamicos({ tipoOtrosi }: PropsDynamicFields) {
                   {(config.tipo === 'fecha' || esFechaConstanciaFirma) && (
                     <input
                       {...field}
+                      value={typeof field.value === 'string' ? field.value : ''}
                       type="date"
                       className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
                         error ? 'border-red-300 bg-red-50' : 'border-gray-300'
