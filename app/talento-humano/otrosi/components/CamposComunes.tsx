@@ -1,11 +1,14 @@
 'use client';
 
 import { Controller, useFormContext } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { buscarEmpleados, tiposDocumento, type Empleado } from '../data/empleados';
 import { configuracionCampos } from '../config/fieldConfig';
+import { esTipoOtrosi, opcionesOtrosi, rutasOtrosi } from '../config/rutasOtrosi';
 import { useState } from 'react';
 
 export function CamposComunes() {
+  const router = useRouter();
   const { control, watch, setValue } = useFormContext();
   const tipoOtrosi = watch('tipoOtrosi');
   const numeroDocumento = watch('numeroDocumento');
@@ -61,17 +64,24 @@ export function CamposComunes() {
               <div>
                 <select
                   {...field}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(value);
+
+                    if (esTipoOtrosi(value)) {
+                      router.push(rutasOtrosi[value]);
+                    }
+                  }}
                   className={`h-14 w-full rounded-lg border px-5 text-lg outline-none transition focus:border-slate-500 ${
                     error ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                 >
                   <option value="">-- Seleccione un tipo --</option>
-                  <option value="cambio_cargo">Cambio de Cargo</option>
-                  <option value="cambio_cargo_salario">Cambio de Cargo y/o Salario</option>
-                  <option value="prorroga">Contrato de trabajo suscrito - Término Indefinido</option>
-                  <option value="cambio_obra">Contrato de trabajo suscrito - Cambio de Obra </option>
-                  <option value="ampliacion_porcentaje">Contrato de trabajo a término de obra o labor determinada - Ampliación de porcentaje de obra</option>
-                  <option value="termino_indefinido">Contrato de trabajo a término fijo inferior a un año suscrito</option>
+                  {opcionesOtrosi.map((opcion) => (
+                    <option key={opcion.valor} value={opcion.valor}>
+                      {opcion.etiqueta}
+                    </option>
+                  ))}
                 </select>
                 {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
               </div>
